@@ -13,7 +13,7 @@
 			align-items: center;
             font-family: Arial, sans-serif;
             text-align: center;
-            background: linear-gradient(to bottom, <?php $favorite_color ?>, #000000);
+            background: linear-gradient(to bottom, <?php $favorite_color; ?>, #000000);
             background-attachment: fixed;
 			font-size: 30px;
         }
