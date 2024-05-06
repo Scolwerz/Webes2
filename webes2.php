@@ -13,7 +13,7 @@
 			align-items: center;
             font-family: Arial, sans-serif;
             text-align: center;
-            background: linear-gradient(to bottom, <?php $favorite_color; ?>, #000000);
+			background: linear-gradient(to bottom, <?php echo $favorite_color; ?>, #000000);
             background-attachment: fixed;
 			font-size: 30px;
         }
@@ -69,15 +69,57 @@
     </style>
 		
     <?php
+	
+	function color($color) {
+		switch ($color) {
+			case "piros":  return "#FF0000"; break;
+			case "zold":   return "#00FF00"; break; 
+			case "sarga":  return "#FFFF00"; break;
+			case "kek":    return "#0000FF"; break;
+			case "fekete": return "#000000"; break;
+			case "feher":  return "#FFFFFF"; break;
+			default:       return "#FFA500"; break;
+		}
+	}
+	
+
+    function decrypt($data, $keys) {
+		$decrypted_data = '';
+		$key_length = count($keys);
+		$key_index = 0;
+
+		for ($i = 0; $i < strlen($data); $i++) {
+			if ($data[$i] !== "\x0A") {
+				$offset = $keys[$key_index % $key_length];
+				$decoded_char = chr(ord($data[$i]) - $offset);
+
+				// Ha kisebb, mint 32 (nem nyomtatható) - nem módosítjuk
+				if (ord($decoded_char) < 32) {
+					$decrypted_data .= $data[$i];
+				} else {
+					$decrypted_data .= $decoded_char;
+				}
+			} else {
+				// Ha EOL karakter, nem kell módosítani
+				$decrypted_data .= $data[$i];
+				$key_index = 0;
+			}
+			$key_index++;
+		}
+
+		return $decrypted_data;
+	}
+	
+	
+	
 	$favorite_color = "#FFA500";
-	$error = "";
+	$error = '';
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $username = $_POST["username"];
         $password = $_POST["password"];
 
-        // Ellenőrizni, hogy a felhasználónév szerepel-e a password.txt-ben
         $passwords = file_get_contents("password.txt");
-        $passwords = decrypt($passwords, [5, -14, 31, -9, 3]); // Feltételezem, hogy a decrypt függvény elérhető
+        $passwords = decrypt($passwords, [5, -14, 31, -9, 3]);
 
         $lines = explode("\n", $passwords);
         $found = false;
@@ -89,88 +131,40 @@
                 $found = true;
                 if ($stored_password === $password) {
                     // Sokeres bejelentkezés, ellenőrizzük, hogy van-e ilyen felhasználónk az adatbázisban
-                    $conn = new mysqli("localhost", "username", "password", "adatok"); // A beállításokat ki kell cserélni a saját szerveredhez
+                    $conn = new mysqli("localhost", "scolwerz@gmail.com", "VPGASolimer77", "webes2_adatok	");
                     if ($conn->connect_error) { die("Kapcsolódási hiba: " . $conn->connect_error); }
-
+					// else
                     $sql = "SELECT Titkos FROM tabla WHERE Username = '$username'";
                     $result = $conn->query($sql);
 
                     if ($result->num_rows > 0) {
-                        // Helyes felhasználónév, jelszó és találtam megfelelő rekordot az adatbázisban
+                        // Helyes felhasználónév, jelszó és mehtalálható az adatbázisban
                         $row = $result->fetch_assoc();
                         $favorite_color = color($row["Titkos"]);
                     }
 					else {
-                        $error = "Nincs ilyen felhasználó az adatbázisban";
-                    }
-
+						$error = "Nincs ilyen felhasználó az adatbázisban";
+					}
                     $conn->close();
                 } else {
-                    // Rossz jelszó
                     $error = "Hibás jelszó.";
-                    header("refresh:3;url=http://police.hu");
+					sleep(3);
+                    header("Location: http://police.hu");
                     exit();
                 }
+				if ($found) { break; }
             }
         }
-
-		// Nincs ilyen felhasználó
-        if (!$found) {
-            
+        if (!$found) {            
             $error = "Nincs ilyen felhasználó";
         }
     }
-
-	function color($color) {
-	switch ($color) {
-        case "piros":  return "#FF0000"; break;
-        case "zold":   return "#00FF00"; break; 
-        case "sarga":  return "#FFFF00"; break;
-        case "kek":    return "#0000FF"; break;
-        case "fekete": return "#000000"; break;
-        case "feher":  return "#FFFFFF"; break;
-        default:       return "#FFA500"; break;
-    }
-
-	
-
-    function decrypt($data, $keys) {
-    $decrypted_data = '';
-    $key_length = count($keys);
-    $key_index = 0;
-
-    for ($i = 0; $i < strlen($data); $i++) {
-        if ($data[$i] !== "\x0A") {
-            $offset = $keys[$key_index % $key_length];
-            $decoded_char = chr(ord($data[$i]) - $offset);
-
-            // Ha kisebb, mint 32 (nem nyomtatható) - nem módosítjuk
-            if (ord($decoded_char) < 32) {
-                $decrypted_data .= $data[$i];
-            } else {
-                $decrypted_data .= $decoded_char;
-            }
-        } else {
-            // Ha EOL karakter, nem kell módosítani
-            $decrypted_data .= $data[$i];
-			$key_index = 0;
-        }
-
-        // Növeljük a kulcsindexet, és ha elértük a tömb végét, kezdjük újra az elején
-			$key_index++;
-		}
-
-		return $decrypted_data;
-	}
 
     ?>
 
 	<h1><b>Szabolcsi Daniel - KITW5W</b></h1>
 	<div class="form-box">
 		<form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
-			<label>
-				<h2>Fill the following fields to sign in</h2>
-			</label>
 			<div>
 				<br>
 				<input type="text" name="username" placeholder="Email" required>
