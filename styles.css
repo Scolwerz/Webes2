@@ -1,0 +1,60 @@
+body {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	font-family: Arial, sans-serif;
+	text-align: center;
+	background: linear-gradient(to bottom, <?php echo $favorite_color; ?>, #000000);
+	background-attachment: fixed;
+	font-size: 30px;
+}
+.form-box {
+	width: 444px;
+	height: 333px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-bottom: 20px
+}
+
+form {
+	width: 444px;
+	height: 333px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-bottom: 20px;
+	background: transparent;
+	border: 2px solid rgba(255, 0, 0, 0.5);
+	backdrop-filter: blur(10px);
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+	border-radius: 8px;
+	padding: 40px 40px;
+}
+
+h1 {
+	position: absolute;
+	font-weight: bold;
+	font-size: 36px;
+	color: #FFFFFF;
+}
+h2 {
+	position: absolute;
+	font-size: 20px;
+	color: #FFFFFF;
+}
+input {
+	font-size: 16px;
+	width: 100%;
+	height: 44px;
+	border: 2px solid;
+	border-radius: 4px;
+	padding: 10px 44px 10px 10px;
+	justify-content: center;
+	align-items: center;
+	background-color: rgba(255, 255, 255, 0.2);
+}
+.signin {
+	padding: 0;
+	cursor: pointer;
+}
