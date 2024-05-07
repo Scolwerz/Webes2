@@ -131,7 +131,7 @@
                 $found = true;
                 if ($stored_password === $password) {
                     // Sokeres bejelentkezés, ellenőrizzük, hogy van-e ilyen felhasználónk az adatbázisban
-                    $conn = new mysqli("localhost", "scolwerz@gmail.com", "VPGASolimer77", "webes2_adatok	");
+                    $conn = new mysqli("localhost", "uname", "passw", "webes2_adatok	");
                     if ($conn->connect_error) { die("Kapcsolódási hiba: " . $conn->connect_error); }
 					// else
                     $sql = "SELECT Titkos FROM tabla WHERE Username = '$username'";
