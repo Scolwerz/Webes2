@@ -26,13 +26,13 @@ function decrypt($data) {
 			// Ha kisebb, mint 32 (nem nyomtatható) - nem módosítjuk
 			if (ord($decoded_char) < 32) { $decrypted_data .= $data[$i]; }
 			else 						 { $decrypted_data .= $decoded_char; }
+    $key_index++;
 		}
 		else {
 			// Ha EOL karakter
 			$decrypted_data .= $data[$i];
 			$key_index = 0;
 		}
-		$key_index++;
 	}
 	return $decrypted_data;
 }
@@ -48,7 +48,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" &&
 	// password.txt
     $coded_passwords = file_get_contents("password.txt");
     $passwords = decrypt($coded_passwords);
-	$key_and_value = array();
+	$login_dict = array();
 
     $lines = explode("\n", $passwords);
     foreach ($lines as $line) {
@@ -56,7 +56,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" &&
 		if (count($parts) == 2) {
 			$stored_username = $parts[0];
 			$stored_password = $parts[1];
-			$key_and_value[$stored_username] = $stored_password;
+			$login_dict[$stored_username] = $stored_password;
 		}
 	}
 
@@ -66,7 +66,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" &&
 
 	// Mysql
 	if (array_key_exists($username, $key_and_value)) {
-		if ($password == $key_and_value[$username]) {
+		if ($password == $login_dict[$username]) {
 			$server = "localhost";
 			$dbusername = "id22163654_webes2_adatok";
 			$dbpassword = "Webes2_adatok_jelszo";
@@ -84,7 +84,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" &&
                 $row = $result->fetch_assoc();
                 $favorite_color = color($row["Titkos"]);
             }
-			$background_color = "var bodyColor = '$favorite_color';";
+			$background_color = "var fav_color = '$favorite_color';";
 		}
 		else {
 			echo "Helytelen jelszó!";
@@ -119,12 +119,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" &&
 		</form>
 	</div>
 	<script>
-		<?php
-			if (isset($background_color)) { echo $background_color; }
-		?>
+		<?phpif (isset($background_color)) { echo $background_color; } ?>
 		document.addEventListener('DOMContentLoaded', function() {
 			if (typeof bodyColor !== 'undefined') {
-				document.body.style.backgroundColor = bodyColor;
+				document.body.style.backgroundColor = fav_color;
 			}
 		});
 	</script>
